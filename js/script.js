@@ -100,11 +100,14 @@ window.addEventListener('DOMContentLoaded', () => {
           modal = document.querySelector('.modal'),
           modalCloseBtn = document.querySelector('[data-close]');
 
+    function openModal() {
+        modal.classList.toggle('show');
+        document.body.style.overflow = 'hidden'; //блокируем прокрутку экрана
+        clearInterval(modalTimerId); //убираем таймаут если юзер открывал модал
+    }
+
     modalTrigger.forEach(btn => {
-        btn.addEventListener('click', () => {
-            modal.classList.toggle('show');
-            document.body.style.overflow = 'hidden'; //блокируем прокрутку экрана
-        });
+        btn.addEventListener('click', openModal);
     });
 
     function closeModal() {
@@ -120,10 +123,22 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.addEventListener('keydown', (e) => { //если нажата Esc - закрыть
+    document.addEventListener('keydown', (e) => {//если нажата Esc - закрыть модал
         if (e.code === "Escape" && modal.classList.contains('show')) {
             closeModal();
         }
     });
+
+    const modalTimerId = setTimeout(openModal, 15000);
+
+    function showModalByScroll() { //Когда долистал до конца - вызов модал
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) { 
+            openModal();
+            window.removeEventListener('scroll', showModalByScroll);
+            //выше: если модал вызывался прокручиванием 1 раз, то больше не будет
+        }
+    }
+
+    window.addEventListener('scroll', showModalByScroll);
 
 });
